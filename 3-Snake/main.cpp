@@ -17,11 +17,22 @@ int main(int agrc, char *argv[])
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
 
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "SFML works!",sf::Style::Fullscreen, settings);
+    int width = 800, height = 800;
+    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Default, settings);
     //sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
 
     /* Game variables*/
     sf::Clock clock;
+
+    int cellSize = 15;
+    Snake snake(width, height, cellSize , 10);
+
+    sf::Vector2<int> prize;
+
+    srand(time(0));
+
+    prize.x = rand() % (width/cellSize) -1;
+    prize.y = rand() % (width/cellSize) -1;
 
     bool isPaused = false;
 
@@ -42,7 +53,6 @@ int main(int agrc, char *argv[])
         {
             if (event.type == sf::Event::Closed)
                 window.close();
-
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -56,6 +66,23 @@ int main(int agrc, char *argv[])
             usleep(300000);
         }
 
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+        {
+            snake.move(-1, 0);
+        }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        {
+            snake.move(1, 0);
+        }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+        {
+            snake.move(0, -1);
+        }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        {
+            snake.move(0, 1);
+        }
+
         /*     
         ****************************************     
         Update the scene :)
@@ -64,12 +91,21 @@ int main(int agrc, char *argv[])
 
        if (!isPaused) {
 
-                
+           snake.update(&prize);
             // Draw our game scene here
-                
+            sf::RectangleShape prizR;
+            prizR.setPosition(prize.x * cellSize, prize.y * cellSize);
+            prizR.setSize(sf::Vector2f(cellSize, cellSize));
+            prizR.setFillColor(sf::Color(200, 10, 100));
+            window.draw(prizR);
+
+            for (auto cellR : snake.draw()) {
+                window.draw(*cellR);
+                delete cellR;
+            }
             // Show everything we just drew
             window.display();
-            usleep(10000);
+            usleep(100000);
        }
     }
 

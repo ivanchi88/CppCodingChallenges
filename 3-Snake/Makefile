@@ -1,6 +1,6 @@
 output=.\\dist\\game
 
-SFML=D:\Programacion\C++\BookBeginingC++Games\SFML
+SFML=..\SFML
 SFMLLIBS = -L$(SFML)\lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 SFML_INCLUDE= -I$(SFML)\include
 
