@@ -2,12 +2,14 @@
 #include <random>
 #include <vector>
 #include <SFML/OpenGL.hpp>
+#include <string>
 
 class Box {
     public:
-        Box(float x, float y,float z,float rad);
-        void divide();
+        Box(float x, float y,float z,float siz);
+        std::vector<Box> divide();
         void draw();
+        std::string toString();
     private:
-        float posX, posY, posZ, radius;
+        float posX, posY, posZ, size;
 };

@@ -11,6 +11,8 @@
 
 #define assetsFolder "./resources/" 
 
+void divideAll (std::vector<Box> *boxes);
+
 
 int main(int agrc, char *argv[])
 {
@@ -42,7 +44,10 @@ int main(int agrc, char *argv[])
     bool rotate=true;
 	float angle = 0;
 
-    Box b(0, 0, 0, 200);
+    Box b(0, 0, 0, 2);
+    std::vector<Box> *boxes = new std::vector<Box>();
+    boxes->push_back(b);
+    float lastTime = Clock.getElapsedTime().asSeconds();
 
     while (window.isOpen())
     {
@@ -60,6 +65,13 @@ int main(int agrc, char *argv[])
 
 			if ((Event.type == sf::Event::KeyPressed) && (Event.key.code == sf::Keyboard::A)){
 				angle+=0.5;
+			}
+
+            if ((Event.type == sf::Event::KeyPressed) && (Event.key.code == sf::Keyboard::Space)){
+                if (Clock.getElapsedTime().asSeconds() - lastTime > 3 ) {
+				    divideAll(boxes);
+                    lastTime = Clock.getElapsedTime().asSeconds();
+                }
 			}
  
 		}
@@ -83,10 +95,24 @@ int main(int agrc, char *argv[])
 
         /* draw */
 
-        b.draw();
+        int i = 0;
+        for (Box box : *boxes) {
+            box.draw();
+        }
 			
         // Show everything we just drew
         window.display();
        }
     
+}
+
+void divideAll (std::vector<Box> *boxes) {
+    std::vector<Box> *vectors = new std::vector<Box>();
+    int i = 0;
+    for (auto box : *boxes) {
+        for (auto b : box.divide()) {
+            vectors->push_back(b);
+        }
+    }
+    *boxes = *vectors;
 }
