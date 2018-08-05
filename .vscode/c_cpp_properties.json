@@ -4,8 +4,7 @@
             "name": "Win64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${SFML}/include/**/**",
-                "./libs/ogl"
+                "${SFML}/include/**/**"
             ],
             "defines": [
                 "_DEBUG",

@@ -15,30 +15,34 @@
 int main(int agrc, char *argv[])
 {
 
-    /* Window initialization */
-    sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
+    float w = 800.0, h = 600.0;
 
-    sf::RenderWindow window(sf::VideoMode(800, 600, 32), "SFML OpenGL");
+    sf::Window window(sf::VideoMode(w, h, 32), "SFML OpenGL");
     //sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
 
     /* Game variables*/
     sf::Clock Clock;
 
-
-    glClearDepth(1.f);
+  //prepare OpenGL surface for HSR
+	glClearDepth(1.f);
     glClearColor(0.3f, 0.3f, 0.3f, 0.f);
-    glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
+    glDepthFunc(GL_EQUAL);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
     //// Setup a perspective projection & Camera position
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(90.f, 1.f, 1.f, 300.0f);//fov, aspect, zNear, zFar
+    gluPerspective(60.0f, w/h, 1.0f, 100.0f);
+    
 
     bool rotate=true;
-	float angle;
+	float angle = 0;
+
+    Box b(0, 0, 0, 200);
 
     while (window.isOpen())
     {
@@ -55,7 +59,7 @@ int main(int agrc, char *argv[])
                 window.close();
 
 			if ((Event.type == sf::Event::KeyPressed) && (Event.key.code == sf::Keyboard::A)){
-				rotate=!rotate;
+				angle+=0.5;
 			}
  
 		}
@@ -67,58 +71,22 @@ int main(int agrc, char *argv[])
         // Apply some transformations for the cube
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glTranslatef(0.f, 0.f, -200.f);
+        glTranslatef(0.f, 0.f, -5.f);
 		
+        /* Keeps rotating */
 		if(rotate){
 			angle=Clock.getElapsedTime().asSeconds();
 		}
 		glRotatef(angle * 50, 1.f, 0.f, 0.f);
 		glRotatef(angle * 30, 0.f, 1.f, 0.f);
 		glRotatef(angle * 90, 0.f, 0.f, 1.f);
+
+        /* draw */
+
+        b.draw();
 			
-		
-		 
-		//Draw a cube
-       glBegin(GL_QUADS);//draw some squares
-            glColor3f(0,1,1); //cyan
-            glVertex3f(-50.f, -50.f, -50.f);
-            glVertex3f(-50.f,  50.f, -50.f);
-            glVertex3f( 50.f,  50.f, -50.f);
-            glVertex3f( 50.f, -50.f, -50.f);
-
-            glColor3f(0,0,1); //blue
-            glVertex3f( 50.f, -50.f, 50.f);
-            glVertex3f( 50.f,  50.f, 50.f);
-            glVertex3f(-50.f,  50.f, 50.f);
-            glVertex3f(-50.f, -50.f, 50.f);
-
-            glColor3f(1,0,1); //magenta
-            glVertex3f(-50.f, -50.f,  50.f);
-            glVertex3f(-50.f,  50.f,  50.f);
-            glVertex3f(-50.f,  50.f, -50.f);
-            glVertex3f(-50.f, -50.f, -50.f);
-
-            glColor3f(0,1,0); //green
-            glVertex3f(50.f, -50.f, -50.f);
-            glVertex3f(50.f,  50.f, -50.f);
-            glVertex3f(50.f,  50.f,  50.f);
-            glVertex3f(50.f, -50.f,  50.f);
-
-            glColor3f(1,1,0); //yellow
-            glVertex3f(-50.f, -50.f,  50.f);
-            glVertex3f(-50.f, -50.f, -50.f);
-            glVertex3f( 50.f, -50.f, -50.f);
-            glVertex3f( 50.f, -50.f,  50.f);
-
-            glColor3f(1,0,0); //red
-            glVertex3f( 50.f, 50.f,  50.f);
-            glVertex3f( 50.f, 50.f, -50.f);
-            glVertex3f(-50.f, 50.f, -50.f);
-            glVertex3f(-50.f, 50.f,  50.f);
-
-        glEnd();
-            // Show everything we just drew
-            window.display();
+        // Show everything we just drew
+        window.display();
        }
     
 }

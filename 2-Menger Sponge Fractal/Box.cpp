@@ -1,97 +1,59 @@
 #include "Box.hpp"
-#include <cmath>
 #include <iostream>
-#include <random>
-#include <ctime> // To seed the generator.
-#include <unistd.h>
-#include <chrono>
-#include <vector>
 
-Box::Box(int width, int height, int pos) {
-    windowWidth = width,
-    windowHeight = height;
-
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count() + pos;
-    gen = std::mt19937_64(seed);
-    randSpeed = std::uniform_real_distribution<double>(minSpeed, maxSpeed);
-    randPos = std::uniform_int_distribution<int>(1, 4);
-    ballDirection =  std::uniform_int_distribution<int> (0, 1);
-
-    circle = new sf::CircleShape();
-    circle->setFillColor(sf::Color(255, 255, 255));
-
-
-    drawings = std::vector<sf::Shape*>();
-    drawings.push_back(circle);
-    drawings.push_back(new sf::RectangleShape(sf::Vector2f(trailLength, 1))); //rectangle
-    drawings[1]->setFillColor(sf::Color(245, 245, 245));
-    Box::init();
-}
-
-void Box::init() {
-
-    drawings[1]->setRotation(0);
-
-    do {  
-        xSpeed = randSpeed(gen) ;
-        xSpeed = ballDirection (gen) == 0 ? xSpeed : -xSpeed;
-        ySpeed = randSpeed(gen);
-        ySpeed = ballDirection (gen) == 0 ? ySpeed : -ySpeed;
-    }
-    while(ySpeed == 0 && xSpeed == 0);
-
-
-    int xPos = windowWidth / 2;
-    int yPos = windowHeight / 2;
-
-    circle->setPosition(xPos, yPos);
-
-    int displacement = randPos(gen);
-    circle->move(xSpeed * displacement, ySpeed * displacement);
-    changeSize(); 
-    circle->setRadius(size);
-
-    drawings[1]->setPosition(circle->getPosition().x , circle->getPosition().y + size );
-    sf::RectangleShape* rect = (sf::RectangleShape*) (drawings[1]);
-    rect->setSize(sf::Vector2f(trailLength * module() * 0.0025, 1));
-
-
-    trailAngle = calculateTrailAngle();
-    drawings[1]->rotate(180 + trailAngle);
-}
-
-void Box::update(sf::Time dt) {
+Box::Box(float x, float y,float z,float rad){
     
-    circle->move(xSpeed * dt.asSeconds() * (module() * accelFactor), ySpeed*dt.asSeconds() * (module() * accelFactor));
-    drawings[1]->move(xSpeed * dt.asSeconds() * (module() * accelFactor), ySpeed*dt.asSeconds() * (module() * accelFactor));
-    if (Box::isOutOfBorders()){
-        Box::init();
-    } else {
-        changeSize();
-    }
 }
 
-std::vector<sf::Shape*> Box::draw () {
-    return drawings;
+
+
+void Box::divide() {
+    
 }
 
-double Box::module () {
-    return sqrt(pow(circle->getPosition().x - windowWidth/2, 2) + pow(circle->getPosition().y - windowHeight/2,2));
+void Box::draw () {
+	 glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
+      // Top face (y = 1.0f)
+      // Define vertices in counter-clockwise (CCW) order with normal pointing out
+      glColor3f(0.0f, 1.0f, 0.0f);     // Green
+      glVertex3f( 1.0f, 1.0f, -1.0f);
+      glVertex3f(-1.0f, 1.0f, -1.0f);
+      glVertex3f(-1.0f, 1.0f,  1.0f);
+      glVertex3f( 1.0f, 1.0f,  1.0f);
+ 
+      // Bottom face (y = -1.0f)
+      glColor3f(1.0f, 0.5f, 0.0f);     // Orange
+      glVertex3f( 1.0f, -1.0f,  1.0f);
+      glVertex3f(-1.0f, -1.0f,  1.0f);
+      glVertex3f(-1.0f, -1.0f, -1.0f);
+      glVertex3f( 1.0f, -1.0f, -1.0f);
+ 
+      // Front face  (z = 1.0f)
+      glColor3f(1.0f, 0.0f, 0.0f);     // Red
+      glVertex3f( 1.0f,  1.0f, 1.0f);
+      glVertex3f(-1.0f,  1.0f, 1.0f);
+      glVertex3f(-1.0f, -1.0f, 1.0f);
+      glVertex3f( 1.0f, -1.0f, 1.0f);
+ 
+      // Back face (z = -1.0f)
+      glColor3f(1.0f, 1.0f, 0.0f);     // Yellow
+      glVertex3f( 1.0f, -1.0f, -1.0f);
+      glVertex3f(-1.0f, -1.0f, -1.0f);
+      glVertex3f(-1.0f,  1.0f, -1.0f);
+      glVertex3f( 1.0f,  1.0f, -1.0f);
+ 
+      // Left face (x = -1.0f)
+      glColor3f(0.0f, 0.0f, 1.0f);     // Blue
+      glVertex3f(-1.0f,  1.0f,  1.0f);
+      glVertex3f(-1.0f,  1.0f, -1.0f);
+      glVertex3f(-1.0f, -1.0f, -1.0f);
+      glVertex3f(-1.0f, -1.0f,  1.0f);
+ 
+      // Right face (x = 1.0f)
+      glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
+      glVertex3f(1.0f,  1.0f, -1.0f);
+      glVertex3f(1.0f,  1.0f,  1.0f);
+      glVertex3f(1.0f, -1.0f,  1.0f);
+      glVertex3f(1.0f, -1.0f, -1.0f);
+   glEnd();  // End of drawing color-cube
 }
-
-void Box::changeSize() {
-    size = minSize + (Box::module() * reductionFactor);
-    circle->setRadius(size);
-}
-
-bool Box::isOutOfBorders () {
-    if (circle->getPosition().x < -size || circle->getPosition().x > windowWidth) 
-        return true;
-    if (circle->getPosition().y < -size || circle->getPosition().y > windowHeight)
-        return true;
-    return false;
-}
-
- int Box::calculateTrailAngle(){
-    return (std::atan2(ySpeed, xSpeed) * 180 / 3.1415);
- }

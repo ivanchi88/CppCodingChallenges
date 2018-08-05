@@ -38,6 +38,10 @@
         "utility": "cpp",
         "random": "cpp",
         "chrono": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "functional": "cpp",
+        "cinttypes": "cpp"
     }
 }
