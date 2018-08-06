@@ -6,11 +6,11 @@ SFML_INCLUDE= -I$(SFML)\include
 
 all: compiled
 	echo Build success, running aplication... && $(output)
-compiled: main.o snake.o
-	g++ main.o snake.o -o  $(output) $(SFMLLIBS)
+compiled: main.o drop.o
+	g++ main.o drop.o -o  $(output) $(SFMLLIBS)
 
-main.o : main.cpp Snake.cpp Snake.hpp
+main.o : main.cpp Drop.cpp Drop.hpp
 	g++ -c main.cpp $(SFML_INCLUDE)
 
-snake.o : Snake.cpp Snake.hpp
-	g++ -c Snake.cpp $(SFML_INCLUDE) -o snake.o
+drop.o : Drop.cpp Drop.hpp
+	g++ -c Drop.cpp $(SFML_INCLUDE) -o drop.o
