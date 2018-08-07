@@ -1,0 +1,19 @@
+output=.\\dist\\game
+
+SFML=..\SFML
+SFMLLIBS = -L$(SFML)\lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+SFML_INCLUDE= -I$(SFML)\include
+
+all: compiled
+	echo Build success, running aplication... && $(output)
+compiled: main.o alien.o
+	g++ main.o alien.o player.o -o  $(output) $(SFMLLIBS)
+
+main.o : main.cpp Alien.cpp Alien.hpp
+	g++ -c main.cpp $(SFML_INCLUDE)
+
+alien.o : Alien.cpp Alien.hpp
+	g++ -c Alien.cpp $(SFML_INCLUDE) -o alien.o
+
+player.o : Player.cpp Player.hpp
+g++ -c Player.cpp $(SFML_INCLUDE) -o player.o
