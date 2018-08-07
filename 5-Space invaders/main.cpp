@@ -25,13 +25,25 @@ int main(int agrc, char *argv[])
     /* Game variables*/
     sf::Clock clock;
 
-    /*
-    
-    sf::VertexArray enemies;
-    sf::Texture spriteSheet;
 
-    spriteSheet.loadFromFile("resources\graphics\spaceInvaders.png");
-    */
+    sf::Texture spriteSheet;
+    spriteSheet.loadFromFile("resources\\graphics\\spaceInvaders.png");
+
+
+    int aliensWidth = 11;
+    int aliensHeight = 5;
+    std::vector<Alien> aliens;
+
+    int i = 0;
+    for (int row = 0; row < aliensHeight; row++) {
+        for (int column = 0; column < aliensWidth; column++){
+            aliens.push_back(Alien(width, height, row, column));
+            aliens[i].loadTexture(spriteSheet);
+            i++;
+        }
+    }
+
+
 
 
 
@@ -66,8 +78,6 @@ int main(int agrc, char *argv[])
             isPaused = !isPaused;
             usleep(300000);
         }
-
-
         /*     
         ****************************************     
         Update the scene :)
@@ -76,7 +86,19 @@ int main(int agrc, char *argv[])
 
        if (!isPaused) {
 
+        usleep(300000);
+
         // Show everything we just drew
+
+        i = 0;
+        for (int row = 0; row < aliensHeight; row++) {
+            for (int column = 0; column < aliensWidth; column++){
+            window.draw(aliens[i]);
+            aliens[i].changeState(false);
+            i++;
+            }
+        }
+
         window.display();
        }
     }

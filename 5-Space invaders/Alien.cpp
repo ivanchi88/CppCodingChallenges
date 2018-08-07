@@ -1,4 +1,4 @@
-#include "Drop.hpp"
+#include "Alien.hpp"
 #include <cmath>
 #include <iostream>
 #include <random>
@@ -7,47 +7,82 @@
 #include <chrono>
 #include <vector>
 
-Drop::Drop(int width, int height, int pos) {
+Alien::Alien(int width, int height, int row, int col) {
     screenWidth = width;
     screenHeight = height;
 
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count() + pos;
+    size = sf::Vector2i (width/13, height/10);
+    drawing = new sf::VertexArray();
 
-    gen = std::mt19937_64(seed);
-    randSpeed = std::uniform_real_distribution<double>(minSpeed, maxSpeed);
-    randPos = std::uniform_int_distribution<int>(0, screenWidth);
-
-    body = new sf::RectangleShape();
-    body->setFillColor(sf::Color(180, 10, 255));
-    p = pos;
-
-    init ();
+    _row = row;
+    _col = col;
 }
 
-void Drop::init () {
-    
-    speed = randSpeed(gen);
+bool Alien::loadTexture (sf::Texture &styleSheet) {
 
-    size.x =  1 + (speed / minSpeed);
-    size.y =  5 + (speed / minSpeed)*3;
+    alienTexture = styleSheet;
+    alienVertexs.setPrimitiveType(sf::Quads);
+    alienVertexs.resize(8);
+    drawing->setPrimitiveType(sf::Quads);
+    drawing->resize(4);
 
-    std::cout << size.x << " " << size.y << std::endl;
-    body->setSize(size);
-    body->setPosition(randPos(gen), -randPos(gen));
+    //First state
+    alienVertexs[0].position = sf::Vector2f(0, 0);
+    alienVertexs[1].position = sf::Vector2f(30, 0);
+    alienVertexs[2].position = sf::Vector2f(30, 21);
+    alienVertexs[3].position = sf::Vector2f(0, 21);
 
+    // define its 4 texture coordinates
+    alienVertexs[0].texCoords = sf::Vector2f(0, 0);
+    alienVertexs[1].texCoords = sf::Vector2f(30, 0);
+    alienVertexs[2].texCoords = sf::Vector2f(30, 21);
+    alienVertexs[3].texCoords = sf::Vector2f(0, 21);
+
+
+    //Second state
+    alienVertexs[4].position = sf::Vector2f(0, 0);
+    alienVertexs[5].position = sf::Vector2f(30, 0);
+    alienVertexs[6].position = sf::Vector2f(30, 21);
+    alienVertexs[7].position = sf::Vector2f(0, 21);
+
+    // define its 4 texture coordinates
+    alienVertexs[4].texCoords = sf::Vector2f(0, 24);
+    alienVertexs[5].texCoords = sf::Vector2f(30, 24); 
+    alienVertexs[6].texCoords = sf::Vector2f(30, 45);
+    alienVertexs[7].texCoords = sf::Vector2f(0, 45);
+
+    setPosition(sf::Vector2f(_col * size.x + size.x, _row * size.y + size.y ));
+    setScale(3, 3);
 }
 
-void Drop::update (sf::Time dt) {
+void Alien::update () {
+}
 
-    body->move(0, speed * dt.asSeconds());
-    speed += dt.asSeconds();
-
-    if (body->getPosition().y > screenHeight) {
-        init();
+void Alien::changeState(bool isDead) {
+    if (!isDead) {
+        state = (state == one) ? two : one;
     }
 }
 
-sf::RectangleShape Drop::draw () {
-    return *body;
+void Alien::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    
+        // apply the entity's transform -- combine it with the one that was passed by the caller
+        states.transform *= getTransform(); // getTransform() is defined by sf::Transformable
+
+        // apply the texture
+        states.texture = &alienTexture;
+
+        // you may also override states.shader or states.blendMode if you want
+
+        int inicio = state * 4;
+        int j = 0;
+        for (int i = inicio; i < inicio + 4; i++){
+            drawing[0][j] = alienVertexs[i];
+            j++;
+        }
+
+        // draw the vertex array
+        target.draw(*drawing, states);
+    
 }
 
