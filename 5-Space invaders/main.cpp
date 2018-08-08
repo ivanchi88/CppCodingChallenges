@@ -18,12 +18,13 @@ int main(int agrc, char *argv[])
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
 
-    int width = 1920, height = 1080;
+    int width = 1920, height =1080 ;
     sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Fullscreen, settings);
     //sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
 
     /* Game variables*/
     sf::Clock clock;
+    sf::Clock turnClock;
 
 
     sf::Texture spriteSheet;
@@ -49,6 +50,10 @@ int main(int agrc, char *argv[])
 
     bool isPaused = false;
 
+    int row, col;
+    turnClock.restart();
+    sf::Vector2f speed(10, 0);
+    int delay = 800; 
     while (window.isOpen())
     {
         sf::Time dt = clock.restart();
@@ -86,16 +91,44 @@ int main(int agrc, char *argv[])
 
        if (!isPaused) {
 
-        usleep(300000);
+        if (turnClock.getElapsedTime().asMilliseconds() > delay) {
+            
+            i = 0;
+            for (row = 0; row < aliensHeight; row++) {
+                for (col = 0; col < aliensWidth; col++){
+                    if (aliens[i].getState() != Alien::State::dead){
+                        if ((aliens[i].getPosition().x + speed.x < 10) || (aliens[i].getPosition().x + speed.x > width - aliens[i].getSize().x)) {
+                            speed.x = -speed.x;
+                            speed.y = aliens[i].getSize().y / 2;
+                        }
+                    }
+                    i++;
+                }
+            }
+            
+            
+
+            i = 0;
+            for (row = 0; row < aliensHeight; row++) {
+                for (col = 0; col < aliensWidth; col++){
+                    if (aliens[i].getState() != Alien::State::dead) {
+                        aliens[i].update(speed);
+                    }
+                    //std::cout << speed.x << " " << speed.y << std::endl;
+                    i++;
+                }
+            }
+            speed.y = 0;
+            turnClock.restart();
+        }
 
         // Show everything we just drew
 
         i = 0;
-        for (int row = 0; row < aliensHeight; row++) {
-            for (int column = 0; column < aliensWidth; column++){
-            window.draw(aliens[i]);
-            aliens[i].changeState(false);
-            i++;
+        for (row = 0; row < aliensHeight; row++) {
+            for (col = 0; col < aliensWidth; col++){
+                window.draw(aliens[i]);
+                i++;
             }
         }
 

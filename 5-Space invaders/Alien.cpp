@@ -22,9 +22,11 @@ bool Alien::loadTexture (sf::Texture &styleSheet) {
 
     alienTexture = styleSheet;
     alienVertexs.setPrimitiveType(sf::Quads);
-    alienVertexs.resize(8);
+    alienVertexs.resize(12); /* First state, second and diying */
     drawing->setPrimitiveType(sf::Quads);
     drawing->resize(4);
+
+
 
     //First state
     alienVertexs[0].position = sf::Vector2f(0, 0);
@@ -51,17 +53,53 @@ bool Alien::loadTexture (sf::Texture &styleSheet) {
     alienVertexs[6].texCoords = sf::Vector2f(30, 45);
     alienVertexs[7].texCoords = sf::Vector2f(0, 45);
 
-    setPosition(sf::Vector2f(_col * size.x + size.x, _row * size.y + size.y ));
-    setScale(3, 3);
+    //Dying state
+    alienVertexs[8].position = sf::Vector2f(0, 0);
+    alienVertexs[9].position = sf::Vector2f(34, 0);
+    alienVertexs[10].position = sf::Vector2f(34, 18);
+    alienVertexs[11].position = sf::Vector2f(0, 18);
+
+    // define its 4 texture coordinates
+    alienVertexs[8].texCoords = sf::Vector2f(107, 0);
+    alienVertexs[9].texCoords = sf::Vector2f(148, 0); 
+    alienVertexs[10].texCoords = sf::Vector2f(148, 19);
+    alienVertexs[11].texCoords = sf::Vector2f(107, 19);
+
+
+
+    position.x = _col * size.x + size.x;
+    position.y = _row * size.y + size.y/4;
+    setPosition(position);
+    setScale( ( 2 *  1920 / screenWidth) * screenWidth  / screenHeight, (  2 * 1080 /screenHeight) * screenWidth / screenHeight);
+    return true;
 }
 
-void Alien::update () {
+void Alien::update (sf::Vector2f speed) {
+    if (state != dead && state != dying) {
+        this->changeState(false);
+        position += speed;
+        this->setPosition(position);
+    } else {
+        
+    }
 }
 
 void Alien::changeState(bool isDead) {
     if (!isDead) {
         state = (state == one) ? two : one;
     }
+}
+
+Alien::State Alien::getState() {
+    return this->state;
+}
+
+sf::Vector2f Alien::getPosition () {
+    return position;
+}
+
+sf::Vector2i Alien::getSize() {
+    return size;
 }
 
 void Alien::draw(sf::RenderTarget& target, sf::RenderStates states) const {
