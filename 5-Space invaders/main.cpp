@@ -7,6 +7,7 @@
 #include "Player.hpp"
 #include <chrono> //For system_clock
 #include <unistd.h>
+#include "State.hpp"
 
 #define assetsFolder "./resources/" 
 
@@ -16,10 +17,10 @@ int main(int agrc, char *argv[])
 
     /* Window initialization */
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
+    //settings.antialiasingLevel = 8;
 
     int width = 1920, height =1080 ;
-    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Fullscreen, settings);
+    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Default, settings);
     //sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
 
     /* Game variables*/
@@ -45,8 +46,8 @@ int main(int agrc, char *argv[])
     }
 
 
-
-
+    Player player(width, height);
+    player.loadTexture(spriteSheet);
 
     bool isPaused = false;
 
@@ -71,11 +72,25 @@ int main(int agrc, char *argv[])
         {
             if (event.type == sf::Event::Closed)
                 window.close();
-        }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-        {
-            window.close();
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
+                window.close();
+
+			if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::A)){
+				player.move(-1.0);
+			} else 
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::D)){
+				player.move(1.0);
+			} else 
+            if ((event.type == sf::Event::KeyReleased) && ((event.key.code == sf::Keyboard::A) || (event.key.code == sf::Keyboard::D))){
+				player.move(0.0);
+			} else
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::W)){
+				player.shoot();
+			} else
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space)){
+				player.shoot();
+			}
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
@@ -96,9 +111,10 @@ int main(int agrc, char *argv[])
             i = 0;
             for (row = 0; row < aliensHeight; row++) {
                 for (col = 0; col < aliensWidth; col++){
-                    if (aliens[i].getState() != Alien::State::dead){
+                    if (aliens[i].getState() != State::dead){
                         if ((aliens[i].getPosition().x + speed.x < 10) || (aliens[i].getPosition().x + speed.x > width - aliens[i].getSize().x)) {
                             speed.x = -speed.x;
+                            delay *= 0.6;
                             speed.y = aliens[i].getSize().y / 2;
                         }
                     }
@@ -106,12 +122,10 @@ int main(int agrc, char *argv[])
                 }
             }
             
-            
-
             i = 0;
             for (row = 0; row < aliensHeight; row++) {
                 for (col = 0; col < aliensWidth; col++){
-                    if (aliens[i].getState() != Alien::State::dead) {
+                    if (aliens[i].getState() != State::dead) {
                         aliens[i].update(speed);
                     }
                     //std::cout << speed.x << " " << speed.y << std::endl;
@@ -122,6 +136,8 @@ int main(int agrc, char *argv[])
             turnClock.restart();
         }
 
+        player.update(dt);
+
         // Show everything we just drew
 
         i = 0;
@@ -131,6 +147,10 @@ int main(int agrc, char *argv[])
                 i++;
             }
         }
+
+
+
+        window.draw(player);
 
         window.display();
        }

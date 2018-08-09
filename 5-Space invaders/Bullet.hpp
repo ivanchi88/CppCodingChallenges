@@ -1,27 +1,23 @@
 #include <SFML/Graphics.hpp>
+#include"State.hpp"
 #include <random>
 #include <vector>
-#include <iostream>
-#include "State.hpp"
-class Alien : public sf::Drawable, protected sf::Transformable{
+
+class Bullet : public sf::Drawable, protected sf::Transformable{
     public:
-        Alien(int width, int height, int row, int col);
+        Bullet(int width, int height);
+        Bullet();
         void update(sf::Vector2f speed);
         bool loadTexture(sf::Texture &styleSheet);
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-        void changeState (bool isDead);
-        sf::Vector2f getPosition ();
-        sf::Vector2i getSize();
-        State getState ();
-        sf::Rect<float> getHitbox();
     private:
-        void init();
+
         int screenHeight, screenWidth, _row, _col;
         sf::Rect<float> hitbox;
         sf::Vector2i size;
         sf::Vector2f position;
-        sf::Texture alienTexture;
-        sf::VertexArray alienVertexs;
+        sf::Texture bulletTexture;
+        sf::VertexArray bulletVertexs;
         sf::VertexArray *drawing;
         State state = State::one;
 };

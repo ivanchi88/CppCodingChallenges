@@ -1,17 +1,10 @@
 #include "Alien.hpp"
-#include <cmath>
-#include <iostream>
-#include <random>
-#include <ctime> // To seed the generator.
-#include <unistd.h>
-#include <chrono>
-#include <vector>
 
 Alien::Alien(int width, int height, int row, int col) {
     screenWidth = width;
     screenHeight = height;
 
-    size = sf::Vector2i (width/13, height/10);
+    size = sf::Vector2i (width/22, height/20);
     drawing = new sf::VertexArray();
 
     _row = row;
@@ -26,38 +19,36 @@ bool Alien::loadTexture (sf::Texture &styleSheet) {
     drawing->setPrimitiveType(sf::Quads);
     drawing->resize(4);
 
-
-
     //First state
     alienVertexs[0].position = sf::Vector2f(0, 0);
-    alienVertexs[1].position = sf::Vector2f(30, 0);
-    alienVertexs[2].position = sf::Vector2f(30, 21);
-    alienVertexs[3].position = sf::Vector2f(0, 21);
+    alienVertexs[1].position = sf::Vector2f(1, 0);
+    alienVertexs[2].position = sf::Vector2f(1, 1);
+    alienVertexs[3].position = sf::Vector2f(0, 1);
 
     // define its 4 texture coordinates
     alienVertexs[0].texCoords = sf::Vector2f(0, 0);
     alienVertexs[1].texCoords = sf::Vector2f(30, 0);
-    alienVertexs[2].texCoords = sf::Vector2f(30, 21);
-    alienVertexs[3].texCoords = sf::Vector2f(0, 21);
+    alienVertexs[2].texCoords = sf::Vector2f(30, 22);
+    alienVertexs[3].texCoords = sf::Vector2f(0, 22);
 
 
     //Second state
     alienVertexs[4].position = sf::Vector2f(0, 0);
-    alienVertexs[5].position = sf::Vector2f(30, 0);
-    alienVertexs[6].position = sf::Vector2f(30, 21);
-    alienVertexs[7].position = sf::Vector2f(0, 21);
+    alienVertexs[5].position = sf::Vector2f(1, 0);
+    alienVertexs[6].position = sf::Vector2f(1, 1);
+    alienVertexs[7].position = sf::Vector2f(0, 1);
 
     // define its 4 texture coordinates
     alienVertexs[4].texCoords = sf::Vector2f(0, 24);
     alienVertexs[5].texCoords = sf::Vector2f(30, 24); 
-    alienVertexs[6].texCoords = sf::Vector2f(30, 45);
-    alienVertexs[7].texCoords = sf::Vector2f(0, 45);
+    alienVertexs[6].texCoords = sf::Vector2f(30, 46);
+    alienVertexs[7].texCoords = sf::Vector2f(0, 46);
 
     //Dying state
     alienVertexs[8].position = sf::Vector2f(0, 0);
-    alienVertexs[9].position = sf::Vector2f(34, 0);
-    alienVertexs[10].position = sf::Vector2f(34, 18);
-    alienVertexs[11].position = sf::Vector2f(0, 18);
+    alienVertexs[9].position = sf::Vector2f(1, 0);
+    alienVertexs[10].position = sf::Vector2f(1, 1);
+    alienVertexs[11].position = sf::Vector2f(0, 1);
 
     // define its 4 texture coordinates
     alienVertexs[8].texCoords = sf::Vector2f(107, 0);
@@ -65,19 +56,28 @@ bool Alien::loadTexture (sf::Texture &styleSheet) {
     alienVertexs[10].texCoords = sf::Vector2f(148, 19);
     alienVertexs[11].texCoords = sf::Vector2f(107, 19);
 
+    
+    setScale(size.x , size.y);
 
+    hitbox.width = size.x;
+    hitbox.height = size.y;
 
-    position.x = _col * size.x + size.x;
-    position.y = _row * size.y + size.y/4;
+    position.x = _col * (size.x + size.x * 0.5) + size.x;
+    position.y = _row * (size.y + size.y * 0.3) + size.y;
+
     setPosition(position);
-    setScale( ( 2 *  1920 / screenWidth) * screenWidth  / screenHeight, (  2 * 1080 /screenHeight) * screenWidth / screenHeight);
+
+    hitbox.left = position.x;
+    hitbox.top = position.y;
     return true;
 }
 
 void Alien::update (sf::Vector2f speed) {
-    if (state != dead && state != dying) {
+    if (state != State::dead && state != State::dying) {
         this->changeState(false);
-        position += speed;
+            position += speed;
+            hitbox.left = position.x;
+            hitbox.top = position.y;
         this->setPosition(position);
     } else {
         
@@ -86,11 +86,15 @@ void Alien::update (sf::Vector2f speed) {
 
 void Alien::changeState(bool isDead) {
     if (!isDead) {
-        state = (state == one) ? two : one;
+        state = (state == State::one) ? State::two : State::one;
     }
 }
 
-Alien::State Alien::getState() {
+sf::Rect<float> Alien::getHitbox(){
+
+}
+
+State Alien::getState() {
     return this->state;
 }
 
@@ -112,15 +116,24 @@ void Alien::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 
         // you may also override states.shader or states.blendMode if you want
 
-        int inicio = state * 4;
+        int inicio = (int) state * 4;
         int j = 0;
         for (int i = inicio; i < inicio + 4; i++){
             drawing[0][j] = alienVertexs[i];
             j++;
         }
 
+
+        sf::RectangleShape r;
+        r.setFillColor(sf::Color(255, 20, 50));
+        r.setOutlineColor(sf::Color(100, 200, 100));
+        r.setOutlineThickness(1);
+        r.setSize(sf::Vector2f(hitbox.width, hitbox.height));
+        r.setPosition(hitbox.left, hitbox.top);
+        //std::cout << size.x << " " << size.y << std::endl;
+        target.draw(r);    
+
         // draw the vertex array
         target.draw(*drawing, states);
-    
 }
 

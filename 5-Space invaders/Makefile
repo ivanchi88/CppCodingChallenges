@@ -6,10 +6,10 @@ SFML_INCLUDE= -I$(SFML)\include
 
 all: compiled
 	echo Build success, running aplication... && $(output)
-compiled: main.o alien.o player.o
-	g++ main.o alien.o player.o -o  $(output) $(SFMLLIBS)
+compiled: main.o alien.o player.o bullet.o 
+	g++ main.o alien.o player.o bullet.o -o  $(output) $(SFMLLIBS)
 
-main.o : main.cpp Alien.cpp Alien.hpp
+main.o : main.cpp Alien.cpp Alien.hpp 
 	g++ -c main.cpp $(SFML_INCLUDE)
 
 alien.o : Alien.cpp Alien.hpp
@@ -17,3 +17,6 @@ alien.o : Alien.cpp Alien.hpp
 
 player.o : Player.cpp Player.hpp
 	g++ -c Player.cpp $(SFML_INCLUDE) -o player.o
+
+bullet.o : Bullet.cpp Bullet.hpp
+	g++ -c Bullet.cpp $(SFML_INCLUDE) -o bullet.o
