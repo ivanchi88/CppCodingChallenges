@@ -1,9 +1,12 @@
+#pragma once
 #include <SFML/Graphics.hpp>
 #include <random>
 #include <vector>
 #include <iostream>
 #include "State.hpp"
-class Alien : public sf::Drawable, protected sf::Transformable{
+#include "Shooteable.hpp"
+
+class Alien : public sf::Drawable, protected sf::Transformable,  public Shooteable{
     public:
         Alien(int width, int height, int row, int col);
         void update(sf::Vector2f speed);
@@ -14,6 +17,7 @@ class Alien : public sf::Drawable, protected sf::Transformable{
         sf::Vector2i getSize();
         State getState ();
         sf::Rect<float> getHitbox();
+        void kill();
     private:
         void init();
         int screenHeight, screenWidth, _row, _col;

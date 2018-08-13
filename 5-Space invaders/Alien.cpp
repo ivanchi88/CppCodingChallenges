@@ -74,24 +74,26 @@ bool Alien::loadTexture (sf::Texture &styleSheet) {
 
 void Alien::update (sf::Vector2f speed) {
     if (state != State::dead && state != State::dying) {
-        this->changeState(false);
+            this->changeState(false);
             position += speed;
             hitbox.left = position.x;
             hitbox.top = position.y;
-        this->setPosition(position);
+            this->setPosition(position);
     } else {
-        
+        state = State::dead;
     }
 }
 
 void Alien::changeState(bool isDead) {
     if (!isDead) {
         state = (state == State::one) ? State::two : State::one;
+    } else {
+        state = State::dying;
     }
 }
 
 sf::Rect<float> Alien::getHitbox(){
-
+    return this->hitbox;
 }
 
 State Alien::getState() {
@@ -116,24 +118,34 @@ void Alien::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 
         // you may also override states.shader or states.blendMode if you want
 
-        int inicio = (int) state * 4;
-        int j = 0;
-        for (int i = inicio; i < inicio + 4; i++){
-            drawing[0][j] = alienVertexs[i];
-            j++;
+        if (state != State::dead) {
+
+            int inicio = (int) state * 4;
+            int j = 0;
+            for (int i = inicio; i < inicio + 4; i++){
+                drawing[0][j] = alienVertexs[i];
+                j++;
+            }
+
+
+            sf::RectangleShape r;
+            r.setFillColor(sf::Color(255, 20, 50));
+            r.setOutlineColor(sf::Color(100, 200, 100));
+            r.setOutlineThickness(1);
+            r.setSize(sf::Vector2f(hitbox.width, hitbox.height));
+            r.setPosition(hitbox.left, hitbox.top);
+            //std::cout << size.x << " " << size.y << std::endl;
+            //target.draw(r);    
+
+            // draw the vertex array
+            target.draw(*drawing, states);
         }
+}
 
-
-        sf::RectangleShape r;
-        r.setFillColor(sf::Color(255, 20, 50));
-        r.setOutlineColor(sf::Color(100, 200, 100));
-        r.setOutlineThickness(1);
-        r.setSize(sf::Vector2f(hitbox.width, hitbox.height));
-        r.setPosition(hitbox.left, hitbox.top);
-        //std::cout << size.x << " " << size.y << std::endl;
-        target.draw(r);    
-
-        // draw the vertex array
-        target.draw(*drawing, states);
+void Alien::kill(){
+    std::cout << "killed "  << _col << " " << _row << std::endl;
+    changeState(true);
+    hitbox.top = -size.y * 2;
+    hitbox.left = -size.x *2;
 }
 

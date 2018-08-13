@@ -17,11 +17,11 @@ void Player::move(float direction) {
 }
 
 void Player::shoot () {
-
+    bullet->shoot(position.x + size.x/2, position.y, -1);
 }
 
 sf::Rect<float> Player::getHitbox(){
-
+    return hitbox;
 }
 
 bool Player::loadTexture (sf::Texture &styleSheet) {
@@ -73,16 +73,21 @@ bool Player::loadTexture (sf::Texture &styleSheet) {
     hitbox.left = position.x;
     hitbox.top = position.y;
 
+    bullet->loadTexture(styleSheet);
+
     return true;
 }
 
-void Player::update (sf::Time dt) {
+void Player::update (sf::Time dt, std::vector<Shooteable*> objetives) {
     if (state != State::dead && state !=State::dying) {
         position.x += speed*dt.asSeconds();
         if (position.x < 0 ||position.x > screenWidth + size.x){
             position.x -= speed*dt.asSeconds();
         }
+        hitbox.left = position.x;
+        hitbox.top = position.y;
         this->setPosition(position);
+        bullet->update(dt, objetives);
     } else {
         
     }
@@ -124,7 +129,6 @@ void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         j++;
     }
 
-
     sf::RectangleShape r;
         r.setFillColor(sf::Color(255, 20, 50));
         r.setOutlineColor(sf::Color(100, 200, 100));
@@ -132,8 +136,16 @@ void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         r.setSize(sf::Vector2f(hitbox.width, hitbox.height));
         r.setPosition(hitbox.left, hitbox.top);
         //std::cout << size.x << " " << size.y << std::endl;
-        target.draw(r);    
+        //target.draw(r);    
 
     // draw the vertex array
     target.draw(*drawing, states);
+}
+
+Bullet* Player::getBullet () {
+    return bullet;
+}
+
+void Player::kill (){
+
 }

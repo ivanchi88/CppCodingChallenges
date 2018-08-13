@@ -9,13 +9,13 @@ all: compiled
 compiled: main.o alien.o player.o bullet.o 
 	g++ main.o alien.o player.o bullet.o -o  $(output) $(SFMLLIBS)
 
-main.o : main.cpp Alien.cpp Alien.hpp 
+main.o : main.cpp Alien.hpp Bullet.hpp Player.hpp
 	g++ -c main.cpp $(SFML_INCLUDE)
 
 alien.o : Alien.cpp Alien.hpp
 	g++ -c Alien.cpp $(SFML_INCLUDE) -o alien.o
 
-player.o : Player.cpp Player.hpp
+player.o : Player.cpp Player.hpp Bullet.hpp
 	g++ -c Player.cpp $(SFML_INCLUDE) -o player.o
 
 bullet.o : Bullet.cpp Bullet.hpp

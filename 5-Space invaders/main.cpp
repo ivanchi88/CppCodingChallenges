@@ -34,13 +34,14 @@ int main(int agrc, char *argv[])
 
     int aliensWidth = 11;
     int aliensHeight = 5;
-    std::vector<Alien> aliens;
-
+    std::vector<Alien*> aliens;
+    std::vector<Shooteable*> aliensToShoot;
     int i = 0;
     for (int row = 0; row < aliensHeight; row++) {
         for (int column = 0; column < aliensWidth; column++){
-            aliens.push_back(Alien(width, height, row, column));
-            aliens[i].loadTexture(spriteSheet);
+            aliens.push_back(new Alien(width, height, row, column));
+            aliensToShoot.push_back(aliens[i]);
+            aliens[i]->loadTexture(spriteSheet);
             i++;
         }
     }
@@ -109,26 +110,28 @@ int main(int agrc, char *argv[])
         if (turnClock.getElapsedTime().asMilliseconds() > delay) {
             
             i = 0;
+            /* Change aliens of row */
             for (row = 0; row < aliensHeight; row++) {
                 for (col = 0; col < aliensWidth; col++){
-                    if (aliens[i].getState() != State::dead){
-                        if ((aliens[i].getPosition().x + speed.x < 10) || (aliens[i].getPosition().x + speed.x > width - aliens[i].getSize().x)) {
+                    if (aliens[i]->getState() != State::dead){
+                        if ((aliens[i]->getPosition().x + speed.x < 10) || (aliens[i]->getPosition().x + speed.x > width - aliens[i]->getSize().x)) {
                             speed.x = -speed.x;
                             delay *= 0.6;
-                            speed.y = aliens[i].getSize().y / 2;
+                            speed.y = aliens[i]->getSize().y - 2 / 3;
                         }
                     }
                     i++;
                 }
             }
             
+            /* Move aliens */
             i = 0;
             for (row = 0; row < aliensHeight; row++) {
                 for (col = 0; col < aliensWidth; col++){
-                    if (aliens[i].getState() != State::dead) {
-                        aliens[i].update(speed);
+                    if (aliens[i]->getState() != State::dead) {
+                        aliens[i]->update(speed);
                     }
-                    //std::cout << speed.x << " " << speed.y << std::endl;
+                    //std::cout << aliensToShoot[i]->getHitbox().left << " " << aliens[i]->getHitbox().left << std::endl;
                     i++;
                 }
             }
@@ -136,20 +139,21 @@ int main(int agrc, char *argv[])
             turnClock.restart();
         }
 
-        player.update(dt);
+
+        player.update(dt, aliensToShoot);
 
         // Show everything we just drew
 
         i = 0;
         for (row = 0; row < aliensHeight; row++) {
             for (col = 0; col < aliensWidth; col++){
-                window.draw(aliens[i]);
+                window.draw(*aliens[i]);
                 i++;
             }
         }
 
 
-
+        window.draw(*player.getBullet());
         window.draw(player);
 
         window.display();
