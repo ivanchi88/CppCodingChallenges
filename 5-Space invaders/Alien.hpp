@@ -5,6 +5,7 @@
 #include <iostream>
 #include "State.hpp"
 #include "Shooteable.hpp"
+#include <SFML/Audio.hpp>
 
 class Alien : public sf::Drawable, protected sf::Transformable,  public Shooteable{
     public:
@@ -18,6 +19,7 @@ class Alien : public sf::Drawable, protected sf::Transformable,  public Shooteab
         State getState ();
         sf::Rect<float> getHitbox();
         void kill();
+        bool getIsRunning();
     private:
         void init();
         int screenHeight, screenWidth, _row, _col;
@@ -28,4 +30,6 @@ class Alien : public sf::Drawable, protected sf::Transformable,  public Shooteab
         sf::VertexArray alienVertexs;
         sf::VertexArray *drawing;
         State state = State::one;
+        sf::SoundBuffer  explosionBuffer;
+        sf::Sound explosionSound;
 };

@@ -6,6 +6,12 @@ Bullet::Bullet(int width, int height){
     isRunning = false;
     size.x = width / 100;
     size.y = height / 25;
+
+    shootSoundBuffer.loadFromFile("resources\\sounds\\shoot2.wav");
+    shootSound.setBuffer(shootSoundBuffer);
+
+    explosionBuffer.loadFromFile("resources\\sounds\\bulletExplosion1.wav");
+    explosionSound.setBuffer(explosionBuffer);
 }
 
 bool Bullet::loadTexture (sf::Texture &styleSheet) {
@@ -41,6 +47,7 @@ void Bullet::shoot(float oriX, float oriY, int direction) {
         hitbox.width = size.x;
         hitbox.top = position.y;
         hitbox.height = size.y;
+        shootSound.play();
     }
 }
 
@@ -55,7 +62,7 @@ void Bullet::update (sf::Time dt, std::vector<Shooteable*> &objetives) {
         } else {
             int pos = 0;
             for (auto objetive : objetives){
-                if (objetive->getHitbox().intersects(this->hitbox)){
+                if (objetive->getIsRunning() && objetive->getHitbox().intersects(this->hitbox)){
                     objetive->kill();
                     objetives.erase(objetives.begin() + pos);
                     isRunning = false;
@@ -65,12 +72,21 @@ void Bullet::update (sf::Time dt, std::vector<Shooteable*> &objetives) {
                 pos++;
             }
         }
-        if (turn > 300) {
+        if (turn > 600) {
             scale(sf::Vector2f(-1,  1));
+            int dir = getScale().x < 0 ? -1 : 0;
+            move(-size.x * dir, 0);
             turn = 0;
         }  
         turn++;
     }
+}
+
+void Bullet::update (sf::Time dt, Shooteable* player) {
+    std::vector<Shooteable*> *pl = new std::vector<Shooteable*>();
+    pl->push_back(player);
+    this->update(dt, *pl);
+    delete pl;
 }
 
 sf::Rect<float> Bullet::getHitbox() {
@@ -100,5 +116,9 @@ void Bullet::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 }
 
 void Bullet::kill () {
-    std::cout << " Bullet " << std::endl;
+    isRunning = false;
+    explosionSound.play();
+}
+bool Bullet::getIsRunning() {
+    return isRunning;
 }

@@ -10,6 +10,9 @@ Player::Player(int width, int height) {
     minSpeed = 500;
     speed = 0;
     bullet = new Bullet(width, height);
+
+    gameOverSoundBuffer.loadFromFile("resources\\sounds\\gameOver.wav");
+    gameOverSound.setBuffer(gameOverSoundBuffer);
 }
 
 void Player::move(float direction) {
@@ -114,32 +117,34 @@ sf::Vector2i Alien::getSize() {
 
 void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     
-    // apply the entity's transform -- combine it with the one that was passed by the caller
-    states.transform *= getTransform(); // getTransform() is defined by sf::Transformable
+    if (!(state == State::dead)) {
+        // apply the entity's transform -- combine it with the one that was passed by the caller
+        states.transform *= getTransform(); // getTransform() is defined by sf::Transformable
 
-    // apply the texture
-    states.texture = &shipTexture;
+        // apply the texture
+        states.texture = &shipTexture;
 
-    // you may also override states.shader or states.blendMode if you want
+        // you may also override states.shader or states.blendMode if you want
 
-    int inicio = (int) state * 4;
-    int j = 0;
-    for (int i = inicio; i < inicio + 4; i++){
-        drawing[0][j] = shipVertexs[i];
-        j++;
+        int inicio = state == State::one ? 0 : 4;
+        int j = 0;
+        for (int i = inicio; i < inicio + 4; i++){
+            drawing[0][j] = shipVertexs[i];
+            j++;
+        }
+
+        sf::RectangleShape r;
+            r.setFillColor(sf::Color(255, 20, 50));
+            r.setOutlineColor(sf::Color(100, 200, 100));
+            r.setOutlineThickness(1);
+            r.setSize(sf::Vector2f(hitbox.width, hitbox.height));
+            r.setPosition(hitbox.left, hitbox.top);
+            //std::cout << size.x << " " << size.y << std::endl;
+            //target.draw(r);    
+
+        // draw the vertex array
+        target.draw(*drawing, states);
     }
-
-    sf::RectangleShape r;
-        r.setFillColor(sf::Color(255, 20, 50));
-        r.setOutlineColor(sf::Color(100, 200, 100));
-        r.setOutlineThickness(1);
-        r.setSize(sf::Vector2f(hitbox.width, hitbox.height));
-        r.setPosition(hitbox.left, hitbox.top);
-        //std::cout << size.x << " " << size.y << std::endl;
-        //target.draw(r);    
-
-    // draw the vertex array
-    target.draw(*drawing, states);
 }
 
 Bullet* Player::getBullet () {
@@ -147,5 +152,10 @@ Bullet* Player::getBullet () {
 }
 
 void Player::kill (){
+    state = State::dying;
+    gameOverSound.play();
+}
 
+bool Player::getIsRunning() {
+    return state == State::dead || state == State::dying;
 }

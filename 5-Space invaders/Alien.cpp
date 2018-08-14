@@ -9,6 +9,9 @@ Alien::Alien(int width, int height, int row, int col) {
 
     _row = row;
     _col = col;
+
+    explosionBuffer.loadFromFile("resources\\sounds\\alienExplosion.wav");
+    explosionSound.setBuffer(explosionBuffer);
 }
 
 bool Alien::loadTexture (sf::Texture &styleSheet) {
@@ -147,5 +150,10 @@ void Alien::kill(){
     changeState(true);
     hitbox.top = -size.y * 2;
     hitbox.left = -size.x *2;
+    explosionSound.play();
+}
+
+bool Alien::getIsRunning() {
+    return state == State::one || state == State::two;
 }
 

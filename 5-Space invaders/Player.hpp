@@ -6,7 +6,8 @@
 #include "Bullet.hpp"
 #include "State.hpp"
 #include "Shooteable.hpp"
-#include "Alien.hpp"
+#include <SFML/Audio.hpp>
+
 class Player : public sf::Drawable, protected sf::Transformable, public Shooteable{
     public:
         Player(int width, int height);
@@ -18,6 +19,7 @@ class Player : public sf::Drawable, protected sf::Transformable, public Shooteab
         sf::Rect<float> getHitbox();
         Bullet* getBullet();
         void kill ();
+        bool getIsRunning();
     private:
         int screenHeight, screenWidth;
         float speed, minSpeed;
@@ -29,4 +31,6 @@ class Player : public sf::Drawable, protected sf::Transformable, public Shooteab
         sf::VertexArray *drawing;
         State state;
         Bullet* bullet;
+        sf::SoundBuffer  gameOverSoundBuffer;
+        sf::Sound gameOverSound;
 };

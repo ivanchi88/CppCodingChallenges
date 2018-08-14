@@ -8,6 +8,7 @@
 #include <chrono> //For system_clock
 #include <unistd.h>
 #include "State.hpp"
+#include <SFML/Audio.hpp>
 
 #define assetsFolder "./resources/" 
 
@@ -31,21 +32,43 @@ int main(int agrc, char *argv[])
     sf::Texture spriteSheet;
     spriteSheet.loadFromFile("resources\\graphics\\spaceInvaders.png");
 
+    sf::SoundBuffer  alienMoveBuffer;
+    alienMoveBuffer.loadFromFile("resources\\sounds\\alienMove2.wav");
+    sf::Sound alienMove;
+    alienMove.setBuffer(alienMoveBuffer);
+
+    sf::SoundBuffer  changeRowBuffer;
+    changeRowBuffer.loadFromFile("resources\\sounds\\changeRow1.wav");
+    sf::Sound changeRow;
+    changeRow.setBuffer(changeRowBuffer);
+
 
     int aliensWidth = 11;
     int aliensHeight = 5;
     std::vector<Alien*> aliens;
-    std::vector<Shooteable*> aliensToShoot;
-    int i = 0;
+    std::vector<Bullet*> enemyBullets;
+    std::vector<Shooteable*> thingsToShoot;
+    int maxBullets = 5;
+    int i;
+
+    for (i = 0; i < maxBullets; i++) {
+        enemyBullets.push_back(new Bullet(width, height));
+        thingsToShoot.push_back(enemyBullets[i]);
+        enemyBullets[i]->loadTexture(spriteSheet);
+    }
+
+    i = 0;
     for (int row = 0; row < aliensHeight; row++) {
         for (int column = 0; column < aliensWidth; column++){
             aliens.push_back(new Alien(width, height, row, column));
-            aliensToShoot.push_back(aliens[i]);
+            thingsToShoot.push_back(aliens[i]);
             aliens[i]->loadTexture(spriteSheet);
             i++;
         }
     }
 
+
+    srand(time(NULL));
 
     Player player(width, height);
     player.loadTexture(spriteSheet);
@@ -55,7 +78,9 @@ int main(int agrc, char *argv[])
     int row, col;
     turnClock.restart();
     sf::Vector2f speed(10, 0);
-    int delay = 800; 
+    int delay = 800;
+    bool isShooting = false;
+    sf::Vector2f bulletOrigin;
     while (window.isOpen())
     {
         sf::Time dt = clock.restart();
@@ -123,6 +148,9 @@ int main(int agrc, char *argv[])
                     i++;
                 }
             }
+            if (speed.y != 0) {
+                changeRow.play();
+            }
             
             /* Move aliens */
             i = 0;
@@ -130,6 +158,11 @@ int main(int agrc, char *argv[])
                 for (col = 0; col < aliensWidth; col++){
                     if (aliens[i]->getState() != State::dead) {
                         aliens[i]->update(speed);
+                        if ((!isShooting) && rand() % 1000< 5) {
+                            bulletOrigin.x = aliens[i]->getPosition().x + aliens[i]->getSize().x/2;
+                            bulletOrigin.y = aliens[i]->getPosition().y + aliens[i]->getSize().y;
+                            isShooting = true;
+                        }
                     }
                     //std::cout << aliensToShoot[i]->getHitbox().left << " " << aliens[i]->getHitbox().left << std::endl;
                     i++;
@@ -137,10 +170,19 @@ int main(int agrc, char *argv[])
             }
             speed.y = 0;
             turnClock.restart();
+            alienMove.play();
         }
 
+        for (auto bullet : enemyBullets) {
+            if ((!bullet->getIsRunning() && isShooting))  {
+                bullet->shoot(bulletOrigin.x, bulletOrigin.y, 1);
+                isShooting = false;
+                break;
+            }
+            bullet->update(dt, &player);
+        }
 
-        player.update(dt, aliensToShoot);
+        player.update(dt, thingsToShoot);
 
         // Show everything we just drew
 
@@ -152,7 +194,9 @@ int main(int agrc, char *argv[])
             }
         }
 
-
+        for (auto bullet : enemyBullets) {
+            window.draw(*bullet);
+        }
         window.draw(*player.getBullet());
         window.draw(player);
 
