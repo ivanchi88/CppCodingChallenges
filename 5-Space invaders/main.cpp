@@ -21,7 +21,7 @@ int main(int agrc, char *argv[])
     //settings.antialiasingLevel = 8;
 
     int width = 1920, height =1080 ;
-    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Fullscreen, settings);
     //sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
 
     /* Game variables*/
@@ -78,11 +78,17 @@ int main(int agrc, char *argv[])
     int row, col;
     turnClock.restart();
     sf::Vector2f speed(10, 0);
-    int delay = 800;
+    int delay = 750;
     bool isShooting = false;
     sf::Vector2f bulletOrigin;
+    bool gameOver = false;
+    int alive = 1;
     while (window.isOpen())
     {
+        if (gameOver) {
+            usleep(1000000);
+            break;
+        }
         sf::Time dt = clock.restart();
         window.clear(sf::Color(15, 15, 15));
 
@@ -152,6 +158,7 @@ int main(int agrc, char *argv[])
                 changeRow.play();
             }
             
+            alive = 0;
             /* Move aliens */
             i = 0;
             for (row = 0; row < aliensHeight; row++) {
@@ -163,6 +170,10 @@ int main(int agrc, char *argv[])
                             bulletOrigin.y = aliens[i]->getPosition().y + aliens[i]->getSize().y;
                             isShooting = true;
                         }
+                        if ( (aliens[i]->getIsRunning() && aliens[i]->getHitbox().intersects(player.getHitbox())) || aliens[i]->getPosition().y >= player.getPosition().y) {
+                            player.kill();
+                        }
+                        alive++;
                     }
                     //std::cout << aliensToShoot[i]->getHitbox().left << " " << aliens[i]->getHitbox().left << std::endl;
                     i++;
@@ -172,6 +183,7 @@ int main(int agrc, char *argv[])
             turnClock.restart();
             alienMove.play();
         }
+        
 
         for (auto bullet : enemyBullets) {
             if ((!bullet->getIsRunning() && isShooting))  {
@@ -183,6 +195,8 @@ int main(int agrc, char *argv[])
         }
 
         player.update(dt, thingsToShoot);
+
+        gameOver = (!player.getIsRunning()) || (alive == 0);
 
         // Show everything we just drew
 

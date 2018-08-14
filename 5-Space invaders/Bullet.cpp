@@ -66,7 +66,6 @@ void Bullet::update (sf::Time dt, std::vector<Shooteable*> &objetives) {
                     objetive->kill();
                     objetives.erase(objetives.begin() + pos);
                     isRunning = false;
-                    std::cout << objetives.size() << std::endl;
                     break;
                 }
                 pos++;

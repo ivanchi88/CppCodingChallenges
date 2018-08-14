@@ -157,5 +157,9 @@ void Player::kill (){
 }
 
 bool Player::getIsRunning() {
-    return state == State::dead || state == State::dying;
+    return state == State::one;
 }
+
+ sf::Vector2f Player::getPosition(){
+    return position;
+ }

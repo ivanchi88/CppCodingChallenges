@@ -20,6 +20,7 @@ class Player : public sf::Drawable, protected sf::Transformable, public Shooteab
         Bullet* getBullet();
         void kill ();
         bool getIsRunning();
+        sf::Vector2f getPosition();
     private:
         int screenHeight, screenWidth;
         float speed, minSpeed;

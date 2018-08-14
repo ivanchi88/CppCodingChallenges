@@ -146,7 +146,6 @@ void Alien::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 }
 
 void Alien::kill(){
-    std::cout << "killed "  << _col << " " << _row << std::endl;
     changeState(true);
     hitbox.top = -size.y * 2;
     hitbox.left = -size.x *2;
