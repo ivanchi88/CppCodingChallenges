@@ -3,7 +3,7 @@
 #include <random> 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include "Cell.hpp"
+#include "Planet.hpp"
 #include <chrono> //For system_clock
 #include <unistd.h>
 
@@ -18,8 +18,10 @@ int main(int agrc, char *argv[])
     settings.antialiasingLevel = 8;
 
     int width = 1920, height = 1080;
-    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Fullscreen, settings);
     //sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
+
+    srand(time(NULL));
 
     /* Game variables*/
     sf::Clock clock;
@@ -28,10 +30,13 @@ int main(int agrc, char *argv[])
 
     bool isPaused = false;
 
+    Planet *sun;
+    sun = new Planet(width, height);
+    sf::Vector2f *parentPos = new sf::Vector2f (width/2 - sun->getRadius(), height/2 - sun->getRadius());
     while (window.isOpen())
     {
         sf::Time dt = clock.restart();
-        window.clear();
+        window.clear(sf::Color(30, 30, 30));
 
         // Clear everything from the last frame
         /*     
@@ -60,6 +65,16 @@ int main(int agrc, char *argv[])
             window.close();
         }
 
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+        {
+            if (sun != nullptr) {
+                delete sun;
+                sun = nullptr;
+            }
+            sun = new Planet(width, height);
+            usleep(80000);
+        }
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
         {
             isPaused = !isPaused;
@@ -74,12 +89,14 @@ int main(int agrc, char *argv[])
 
        if (!isPaused) {
 
+           if (sun != nullptr) {
            /* Update the scene */
-            
+            sun->update(dt, *parentPos);
             // Draw our game scene here
-                
+            sun->draw(window);
             // Show everything we just drew
             window.display();
+           }
        }
     }
 
