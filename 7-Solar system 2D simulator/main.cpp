@@ -36,7 +36,7 @@ int main(int agrc, char *argv[])
     while (window.isOpen())
     {
         sf::Time dt = clock.restart();
-        window.clear(sf::Color(30, 30, 30));
+        window.clear(sf::Color(10, 10, 10));
 
         // Clear everything from the last frame
         /*     
@@ -71,6 +71,7 @@ int main(int agrc, char *argv[])
                 delete sun;
                 sun = nullptr;
             }
+            window.clear(sf::Color(10, 10, 10));
             sun = new Planet(width, height);
             usleep(80000);
         }

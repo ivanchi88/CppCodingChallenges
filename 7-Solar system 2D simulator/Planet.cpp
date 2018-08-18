@@ -12,12 +12,13 @@ Planet::Planet(int width, int height, sf::Vector2f *position, float parentRadius
 
     float radius = parentRadius * (1- (((rand() % 50) + 20) / 100.0));
     body = new sf::CircleShape(radius);
-
+    body->setOrigin(radius, radius);
     if (position == nullptr) {
         position = new sf::Vector2f(width/2 - radius, height/2 - radius);
     }
 
     body->setPosition(*position);
+    body->setFillColor(sf::Color(40 * level, 20, 130, 180));
 
     this->distanceToParent = distanceToParent_;
 
@@ -27,7 +28,7 @@ Planet::Planet(int width, int height, sf::Vector2f *position, float parentRadius
     int xOffset;
     int i = 0;
     /* generar satelites */
-    int maxLevels = 3;
+    int maxLevels = 5;
     if (level < maxLevels) {
         while (rand() % 10 < 5 || (level == 0 && i == 0)) {
             //std::cout << "level " << level << " planet " << i << std::endl;
@@ -48,10 +49,10 @@ void Planet::update(sf::Time dt, sf::Vector2f const &parentPos){
    x2 += parentPos.x;
 
    for (auto asteroid : *asteroids){
-       asteroid->update(dt, sf::Vector2f(x2 + body->getRadius(), y2 +  body->getRadius()));
+       asteroid->update(dt, sf::Vector2f(x2 , y2 ));
    }
 
-   body->setPosition(x2 + body->getRadius(), y2 + body->getRadius());
+   body->setPosition(x2 , y2 );
 }
 
 void Planet::rotate () {
