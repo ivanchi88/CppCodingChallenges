@@ -18,20 +18,27 @@ int main(int agrc, char *argv[])
 {
 
     float w = 800.0, h = 600.0;
+    sf::ContextSettings settings;
+    settings.depthBits = 24;
+    settings.stencilBits = 0;
+    settings.antialiasingLevel = 4;
+    settings.majorVersion = 3;
+    settings.minorVersion = 0;
 
-    sf::Window window(sf::VideoMode(w, h, 32), "SFML OpenGL");
+    sf::Window window(sf::VideoMode(w, h, 32), "SFML OpenGL", sf::Style::Default, settings);
     //sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
 
     /* Game variables*/
     sf::Clock Clock;
+    sf::Clock clock;
 
-  //prepare OpenGL surface for HSR
-	glClearDepth(1.f);
-    glClearColor(0.3f, 0.3f, 0.3f, 0.f);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_EQUAL);
-    glCullFace(GL_BACK);
-    glEnable(GL_CULL_FACE);
+    //prepare OpenGL surface for HSR
+	//glClearDepth(1.f);
+    //glClearColor(0.3f, 0.3f, 0.3f, 0.f);
+    //glDepthMask(GL_TRUE);
+    //glDepthFunc(GL_EQUAL);
+   // glCullFace(GL_BACK);
+   // glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
     //// Setup a perspective projection & Camera position
@@ -51,6 +58,7 @@ int main(int agrc, char *argv[])
 
     while (window.isOpen())
     {
+        sf::Time dt = clock.restart();
         // Process events
         sf::Event Event;
         while (window.pollEvent(Event))
