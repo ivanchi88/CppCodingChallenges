@@ -26,7 +26,11 @@ sf::Vector2i Cell::getPosition() {
 
 void Cell::setVisited(){
     isVisited = true;
-    background->setFillColor({0, 200, 100});
+    if ((col == 0) && (row == 0) || (col+1 == screenWidth/size) && (row+1  == screenHeight/size)) {
+        background->setFillColor({255, 20, 130, 255});
+    } else {
+        background->setFillColor({0, 200, 100});
+    }
 }
 
 bool Cell::getIsVisited() {

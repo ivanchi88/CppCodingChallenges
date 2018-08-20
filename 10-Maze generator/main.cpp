@@ -125,7 +125,7 @@ void generateMaze (std::vector<Cell*> *(&cells), Cell* &cellAct, sf::RenderWindo
             cellAct->draw(target);
             cellNeig->draw(target);
             target.display();
-            usleep(10000);
+            //usleep(1000);
             /* end drawing animation */
             generateMaze(cells, cellNeig, target);
         }
