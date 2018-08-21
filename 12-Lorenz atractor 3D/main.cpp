@@ -40,7 +40,7 @@ int main(int agrc, char *argv[])
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(60.0f, w/h, 1.0f, 200.0f);
+    gluPerspective(60.0f, w/h, 0.1f, 200.0f);
 
     std::vector<Point*> *points = new std::vector<Point*>();
     points->push_back(new Point {(rand() % 100) * 0.001, (rand() % 100) * 0.001, (rand() % 100) * 0.001});
