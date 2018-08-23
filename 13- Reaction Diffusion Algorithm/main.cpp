@@ -13,10 +13,11 @@ const int height = 1000;
 const int cellSize = 5;
 const int numberCells = height / cellSize;
 
-const float difusionA = 1.0, difusionB = 0.5, feed = 0.055, kill = 0.012;
+const float difusionA = 1.0, difusionB = 0.5, feed = 0.034, kill = 0.064;
 
-void updateCells(Cell cells[numberCells][numberCells], sf::Time dt);
-void updateCell(Cell cells[numberCells][numberCells], Cell cell, sf::Time dt);
+void updateCells(Cell* *cells[numberCells][numberCells], sf::Time dt, sf::RenderWindow &windows);
+void updateCell(Cell* *cells[numberCells][numberCells], Cell *cell, sf::Time dt);
+float constraint (float n);
 
 int t = 0;
 
@@ -26,11 +27,11 @@ int main(int agrc, char *argv[])
 
     /* Window initialization */
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
+    //settings.antialiasingLevel = 8;
 
     int width = 1000;
-    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Default, settings);
-    //sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(width, height), "Reaction Diffusion algorithm",sf::Style::Default, settings);
+    //sf::RenderWindow window(sf::VideoMode(numberCells, numberCells), "SFML works!");
 
     srand(time(NULL));
 
@@ -39,19 +40,19 @@ int main(int agrc, char *argv[])
 
     bool isPaused = false; 
 
-    Cell cells [numberCells][numberCells];
+    Cell** cells [numberCells][numberCells];
 
     for (int i = 0; i < numberCells; i++) {
         for (int j = 0; j < numberCells; j++) {
-            cells[i][j] = Cell (width, height, i, j, cellSize);
+            (*cells)[i][j] = new Cell (width, height, i, j, cellSize);
         }
     }
 
     /* Pequeño area de B = 1.0 */
     for (int i = 100; i < 110  ; i++) {
         for (int j = 100; j < 110; j++) {
-            cells[i][j].setAB({0.0, 1.0});
-            cells[i][j].setLastAB({0.0, 1.0});
+            (*cells)[i][j]->setAB(0.0, 1.0);
+            (*cells)[i][j]->setLastAB({0.0, 1.0});
         }
     }
 
@@ -105,87 +106,100 @@ int main(int agrc, char *argv[])
         */
 
        if (!isPaused) {  
+           std::cout << "Hola k ase" << std::endl;
            /* Update the scene */
-            updateCells(cells, dt);
+            updateCells(cells, dt, window);
             // Draw our game scene here
-            for (int i = 0; i < numberCells; i++) {
+            /*for (int i = 0; i < numberCells; i++) {
                 for (int j = 0; j < numberCells; j++) {
-                    cells[i][j].draw(window);
-                }
-            }
+                  
+                }*
+            }*/
             // Show everything we just drew
             window.display();
-            //std::cout << dt.asSeconds() << std::endl;
        }
     }
     return 0;
 }
 
-void updateCells(Cell cells[numberCells][numberCells], sf::Time dt) {
+void updateCells(Cell* *cells[numberCells][numberCells], sf::Time dt, sf::RenderWindow &window) {
     for (int i = 0; i < numberCells; i++) {
         for (int j = 0; j < numberCells; j++){
-            updateCell(cells, (cells)[i][j], dt);
-            //std::cout << (cells)[i][j].getAB().x << " " << (cells)[i][j].getLastAB().x  << " " << (cells)[i][j].getAB().y << " " << (cells)[i][j].getLastAB().y << std::endl;
+            updateCell(cells, (*cells)[i][j], dt);
+            (*cells)[i][j]->draw(window);
+            //std::cout << (cells)[i][j]->getAB().x << " " << (cells)[i][j]->getLastAB().x  << " " << (cells)[i][j]->getAB().y << " " << (cells)[i][j]->getLastAB().y << std::endl;
         }
     }
 }
 
-void updateCell(Cell cells[numberCells][numberCells], Cell cell, sf::Time dt){
+void updateCell(Cell* *cells[numberCells][numberCells], Cell *cell, sf::Time dt){
     float totalA = 0.0;
     float totalB = 0.0;
-    int cellX = cell.getPosition().x, cellY = cell.getPosition().y;
+    int cellX = cell->getPosition().x, cellY = cell->getPosition().y;
+    std::cout<< cellX << " " << cellY << std::endl;
+
     if (cellX != 0) {
-            totalA += (cells)[cellY][cellX - 1].getLastAB().x * 0.2; // A izquierda centro
-            totalB += (cells)[cellY][cellX - 1].getLastAB().y * 0.2; // B izquierda centro
+            totalA += (*cells)[cellY][cellX - 1]->getLastAB().x * 0.2; // A izquierda centro
+            totalB += (*cells)[cellY][cellX - 1]->getLastAB().y * 0.2; // B izquierda centro
             if (cellY != 0){
-                totalA += (cells)[cellY - 1][cellX - 1].getLastAB().x * 0.05; // A izquierda arriba
-                totalB += (cells)[cellY - 1][cellX - 1].getLastAB().y * 0.05; // B izquierda arriba
+                totalA += (*cells)[cellY - 1][cellX - 1]->getLastAB().x * 0.05; // A izquierda arriba
+                totalB += (*cells)[cellY - 1][cellX - 1]->getLastAB().y * 0.05; // B izquierda arriba
             }
             if (cellY != numberCells-1){
-                totalA += (cells)[cellY + 1][cellX - 1].getLastAB().x * 0.05; // A izquierda abajo
-                totalB += (cells)[cellY + 1][cellX - 1].getLastAB().y * 0.05; // B izquierda abajo
+                totalA += (*cells)[cellY + 1][cellX - 1]->getLastAB().x * 0.05; // A izquierda abajo
+                totalB += (*cells)[cellY + 1][cellX - 1]->getLastAB().y * 0.05; // B izquierda abajo
             }
     }
     if (cellX != numberCells -1) {
-            totalA += (cells)[cellY][cellX + 1].getLastAB().x * 0.2; // A derecha centro
-            totalB += (cells)[cellY][cellX + 1].getLastAB().y * 0.2; // B derecha centro
+            totalA += (*cells)[cellY][cellX + 1]->getLastAB().x * 0.2; // A derecha centro
+            totalB += (*cells)[cellY][cellX + 1]->getLastAB().y * 0.2; // B derecha centro
             if (cellY != 0){
-                totalA += (cells)[cellY - 1][cellX + 1].getLastAB().x * 0.05; // A derecha arriba
-                totalB += (cells)[cellY - 1][cellX + 1].getLastAB().y * 0.05; // B derecha arriba
+                totalA += (*cells)[cellY - 1][cellX + 1]->getLastAB().x * 0.05; // A derecha arriba
+                totalB += (*cells)[cellY - 1][cellX + 1]->getLastAB().y * 0.05; // B derecha arriba
             }
             if (cellY != numberCells-1){
-                totalA += (cells)[cellY + 1][cellX + 1].getLastAB().x * 0.05; // A derecha abajo
-                totalB += (cells)[cellY + 1][cellX + 1].getLastAB().y * 0.05; // B derecha abajo
+                totalA += (*cells)[cellY + 1][cellX + 1]->getLastAB().x * 0.05; // A derecha abajo
+                totalB += (*cells)[cellY + 1][cellX + 1]->getLastAB().y * 0.05; // B derecha abajo
             }
     }
 
     if (cellY != 0) {
-        totalA += (cells)[cellY - 1][cellX].getLastAB().x * 0.2; // A centro arriba
-        totalB += (cells)[cellY - 1][cellX].getLastAB().y * 0.2; // B centro arriba
+        totalA += (*cells)[cellY - 1][cellX]->getLastAB().x * 0.2; // A centro arriba
+        totalB += (*cells)[cellY - 1][cellX]->getLastAB().y * 0.2; // B centro arriba
     }
     if (cellY != numberCells - 1) {
-        totalA += (cells)[cellY + 1][cellX].getLastAB().x * 0.2; // A centro abajo
-        totalB += (cells)[cellY + 1][cellX].getLastAB().y * 0.2; // B centro abajo
+        totalA += (*cells)[cellY + 1][cellX]->getLastAB().x * 0.2; // A centro abajo
+        totalB += (*cells)[cellY + 1][cellX]->getLastAB().y * 0.2; // B centro abajo
     }
-    totalA -= cell.getLastAB().x; // A centro
-    totalB -= cell.getLastAB().y; // B centro
+
+    totalA += -cell->getLastAB().x; // A centro
+    totalB += -cell->getLastAB().y; // B centro
 
     /* laplace * A  &&  B */
-    totalA *= cell.getLastAB().x;
-    totalB *= cell.getLastAB().y;
+    totalA *= cell->getLastAB().x;
+    totalB *= cell->getLastAB().y;
 
     /* difusion */
-    totalA *= difusionA; 
+    totalA *= difusionA;
     totalB *= difusionB;
 
     /* asimilamiento de 2 a en 1 b */
-    totalA -= cell.getLastAB().x * cell.getLastAB().y * cell.getLastAB().y;  
-    totalB += cell.getLastAB().x * cell.getLastAB().y * cell.getLastAB().y;
+    totalA -= cell->getLastAB().x * cell->getLastAB().y * cell->getLastAB().y;  
+    totalB += cell->getLastAB().x * cell->getLastAB().y * cell->getLastAB().y;
 
     /* ratio de alimento-muerte */
-    totalA += feed * (1 - cell.getLastAB().x);
-    totalB += - (kill + feed) * cell.getLastAB().y;
+    totalA += feed * (1.0 - cell->getLastAB().x);
+    totalB += - (kill + feed) * cell->getLastAB().y;
 
+    totalA = cell->getLastAB().x + totalA * 2;
+    totalB = cell->getLastAB().y + totalB * 2;
     /* A = A' + totalA * dt; B = B' + totalB * dt */
-    cell.setAB({cell.getLastAB().x + (totalA) * 2.0, cell.getLastAB().y + (totalB) * 2.0});
+    cell->setAB(constraint(totalA), constraint(totalB));
+}
+
+float constraint(float n) {
+    if (n >= 0.0 && n <= 1.0 ) {
+        return n;
+    }
+    return (n < 0.0) ? 0.0 : 1.0;
 }

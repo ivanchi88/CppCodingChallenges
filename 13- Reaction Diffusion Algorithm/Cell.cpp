@@ -5,6 +5,7 @@ Cell::Cell(int width, int height, int row, int col, int size){
     screenHeight = height;
     this->row = row;
     this->col = col;
+    size = size;
     this->size = size;
 
     background = new sf::RectangleShape({size, size});
@@ -24,9 +25,9 @@ sf::Vector2f Cell::getLastAB(){
     return  {Aant , Bant};
 }
 
-void Cell::setAB(sf::Vector2f ab){
-    A = ab.x;
-    B = ab.y;
+void Cell::setAB(float a, float b){
+    A = a;
+    B = b;
 }
 
 void Cell::setLastAB(sf::Vector2f ab){
@@ -47,13 +48,19 @@ Cell::Cell () {
     
 }
 
+float constraint2(float n) {
+    if (n >= 0.0 && n <= 255.0 ) {
+        return n;
+    }
+    return (n < 0.0) ? 0.0 : 255.0;
+}
 
-
-void Cell::draw(sf::RenderWindow &target){ 
+void Cell::draw(sf::RenderWindow &target){
+    //std::cout << A << " " << Aant << "   " << B << " " << Bant<< std::endl;
     Aant = A;
     Bant = B;
     /* Background */
-    float c = (A - B) * 255;
+    float c = constraint2((A - B)  * 255);
 
     background->setFillColor({c, c, c});
     target.draw(*background);

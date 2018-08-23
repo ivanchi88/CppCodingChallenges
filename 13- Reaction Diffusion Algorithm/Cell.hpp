@@ -16,7 +16,7 @@ class Cell {
 
         sf::Vector2f getAB();
         sf::Vector2f getLastAB();
-        void setAB(sf::Vector2f ab);
+        void setAB(float a, float b);
         void setLastAB(sf::Vector2f ab);
         ~Cell();
     private:

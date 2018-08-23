@@ -40,7 +40,7 @@ int main(int agrc, char *argv[])
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(60.0f, w/h, 0.1f, 200.0f);
+    gluPerspective(60.0f, w/h, 0.1f, 500.0f);
 
     std::vector<Point*> *points = new std::vector<Point*>();
     points->push_back(new Point {(rand() % 100) * 0.001, (rand() % 100) * 0.001, (rand() % 100) * 0.001});
@@ -54,9 +54,11 @@ int main(int agrc, char *argv[])
     float dy = 0;
     float dz = 0;
 
-    float a = 10.0, c = 10.0/3.0, b = 28;
+    float a = 10.0, c = 10.0/3.0, b = 28.0;
 
     float rotation = 0.0;
+
+    bool update = true;
 
     while (window.isOpen())
     {
@@ -86,10 +88,27 @@ int main(int agrc, char *argv[])
                 distance = 0;
                 rotationSpeed = 0;
             }
+
+            if ((Event.type == sf::Event::KeyPressed) && (Event.key.code == sf::Keyboard::R)){
+                update = false;
+                std::cout << "Introduce b value" << std::endl;
+                std::cin >> b;
+                std::cout << b << std::endl;
+                
+                points = new std::vector<Point*>();
+                points->push_back(new Point {(rand() % 100) * 0.001, (rand() % 100) * 0.001, (rand() % 100) * 0.001});
+                Point *lastPoint = (*points)[0];
+                float dx = 0;
+                float dy = 0;
+                float dz = 0;
+                update = true;
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            }
                 
  
 		}
         
+        if (update) {
         //Prepare for drawing
 		// Clear color and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -129,6 +148,8 @@ int main(int agrc, char *argv[])
 			
         // Show everything we just drew
         window.display();
+
+        }
        }
     
 }
