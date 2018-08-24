@@ -4,10 +4,10 @@ Firework::Firework(int width, int height){
     screenWidth = width;
     screenHeight = height;
     size =  5 + rand () % 5;
-    position = new sf::Vector2f(rand() % (width - size) + size, height + rand () % 500);
+    position = new sf::Vector2f(rand() % (width - size) + size, height + rand () % 1000);
     speed = 600 + rand() % 300;
     bodyParts = rand() % 2 + 3;
-    color = new sf::Color(rand() % 250 , rand() % 250 , rand() % 250);
+    color = new sf::Color(rand() % 250 + 50 , rand() % 250 + 50 , rand() % 250 + 50, 255);
 
     body = new std::vector<sf::RectangleShape*>;
     for (int i = 0; i < bodyParts; i++) {
@@ -21,6 +21,12 @@ Firework::Firework(int width, int height){
         sparks->push_back(new Spark());
     }
     isFirstExplosion = true;
+    hasBeenLaunched = false;
+}
+
+void Firework::setBuffers(sf::SoundBuffer &launchBuffer, sf::SoundBuffer &explosionBuffer){
+    launchSound.setBuffer(launchBuffer);
+    explosionSound.setBuffer(explosionBuffer);
 }
 
 void Firework::restart () {
@@ -40,6 +46,7 @@ void Firework::restart () {
     }
 
     isFirstExplosion = true;
+    hasBeenLaunched = false;
 
 }
 
@@ -47,6 +54,12 @@ void Firework::update(sf::Time dt){
     if (speed > 80) {
         if (position->y <= screenHeight) {
             speed -= (400 + rand() % 200) * dt.asSeconds();
+        } else {
+            if (!hasBeenLaunched) {
+                launchSound.stop();
+                launchSound.play();
+                hasBeenLaunched = true;
+            }
         }
         int i = 0;
         for (auto cell : *body) {
@@ -58,6 +71,8 @@ void Firework::update(sf::Time dt){
         if (speed > 0) {
             if (isFirstExplosion) {
                 int i = 0;
+                explosionSound.stop();
+                explosionSound.play();
                 for (auto spark : *sparks) {
                     spark->restart(position->x, position->y, (*body)[0]->getFillColor(), i);
                     i++;

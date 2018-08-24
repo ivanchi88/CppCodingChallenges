@@ -6,13 +6,13 @@ SFML_INCLUDE= -I$(SFML)\include
 
 all: compiled
 	echo Build success, running aplication... && $(output)
-compiled: main.o cell.o spark.o
-	g++ main.o cell.o spark.o -o  $(output) $(SFMLLIBS)
+compiled: main.o firework.o spark.o
+	g++ main.o firework.o spark.o -o  $(output) $(SFMLLIBS)
 
 main.o : main.cpp 
 	g++ -c main.cpp $(SFML_INCLUDE)
 
-cell.o : Firework.cpp Firework.hpp
-	g++ -c Firework.cpp $(SFML_INCLUDE) -o cell.o
+firework.o : Firework.cpp Firework.hpp
+	g++ -c Firework.cpp $(SFML_INCLUDE) -o firework.o
 spark.o : Spark.cpp Spark.hpp
 	g++ -c Spark.cpp $(SFML_INCLUDE) -o spark.o

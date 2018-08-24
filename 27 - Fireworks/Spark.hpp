@@ -14,4 +14,5 @@ class Spark {
         sf::Vector2f *position;
         sf::RectangleShape *body;
         sf::Vector2f *speed;
+        sf::Color* color;
 };

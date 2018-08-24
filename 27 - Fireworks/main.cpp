@@ -19,8 +19,8 @@ int main(int agrc, char *argv[])
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
 
-    int width = 1920, height = 1080;
-    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Fullscreen, settings);
+    int width = 800, height = 900;
+    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Default, settings);
     //sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
 
     srand(time(NULL));
@@ -28,11 +28,16 @@ int main(int agrc, char *argv[])
     /* Game variables*/
     sf::Clock clock;
 
-    const int maxFireworks = 30;
+    sf::SoundBuffer explosionBuffer, launchBuffer;
+    explosionBuffer.loadFromFile("resources\\sound\\explosion.wav");
+    launchBuffer.loadFromFile("resources\\sound\\launch.wav");
+
+    const int maxFireworks = 10;
     std::vector<Firework*> *fireworks;
     fireworks = new std::vector<Firework*> ;
     for (int i = 0; i < maxFireworks; i++) {
         fireworks->push_back(new Firework(width, height));
+        (*fireworks)[i]->setBuffers(launchBuffer, explosionBuffer);
     }
 
     bool isPaused = false;
