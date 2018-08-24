@@ -1,3 +1,5 @@
+#pragma once
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <random>
@@ -5,6 +7,7 @@
 #include <math.h>
 #include "Spark.hpp"
 
+#include <unistd.h>
 
 class Firework {
     public:
@@ -17,6 +20,7 @@ class Firework {
         int screenWidth, screenHeight, size;
         int bodyParts;
         float speed;
+        bool isFirstExplosion;
         sf::Vector2f *position;
         std::vector<Spark*> *sparks;
         std::vector<sf::RectangleShape*> *body;

@@ -4,10 +4,10 @@ Firework::Firework(int width, int height){
     screenWidth = width;
     screenHeight = height;
     size =  5 + rand () % 5;
-    position = new sf::Vector2f(rand() % (width - size) + size, height);
+    position = new sf::Vector2f(rand() % (width - size) + size, height + rand () % 500);
     speed = 600 + rand() % 300;
     bodyParts = rand() % 2 + 3;
-    color = new sf::Color(rand() % 150 + 100, rand() % 150 + 100, rand() % 150 + 100);
+    color = new sf::Color(rand() % 250 , rand() % 250 , rand() % 250);
 
     body = new std::vector<sf::RectangleShape*>;
     for (int i = 0; i < bodyParts; i++) {
@@ -16,17 +16,21 @@ Firework::Firework(int width, int height){
         (*body)[i]->setFillColor(*color);
     }
 
-    sparks = new std::vector<Spark*>;
+    sparks = new std::vector<Spark*>();
+    for (int i = 0; i < Spark::maxSparks; i++){
+        sparks->push_back(new Spark());
+    }
+    isFirstExplosion = true;
 }
 
 void Firework::restart () {
     size =  2 + rand () % 5;
     position->x = rand() % (screenWidth - size) + size;
-    position->y = screenHeight;
+    position->y = screenHeight + rand() % 500;
 
-    color->r = rand() % 150 + 100;
-    color->g = rand() % 150 + 100;
-    color->b = rand() % 150 + 100;
+    color->r = rand() % 250 ;
+    color->g = rand() % 250 ;
+    color->b = rand() % 250 ;
 
     speed = 600 + rand() % 300;
 
@@ -35,11 +39,15 @@ void Firework::restart () {
         (*body)[i]->setFillColor(*color);
     }
 
+    isFirstExplosion = true;
+
 }
 
 void Firework::update(sf::Time dt){
-    if (speed > 50) {
-        speed -= (400 + rand() % 200) * dt.asSeconds();
+    if (speed > 80) {
+        if (position->y <= screenHeight) {
+            speed -= (400 + rand() % 200) * dt.asSeconds();
+        }
         int i = 0;
         for (auto cell : *body) {
             cell->move(0, -speed * dt.asSeconds() - (i * 10) * dt.asSeconds() );
@@ -48,11 +56,19 @@ void Firework::update(sf::Time dt){
         position->y = (*body)[0]->getPosition().y;
     } else {
         if (speed > 0) {
-            speed -= (10 + rand() % 20) * dt.asSeconds();
+            if (isFirstExplosion) {
+                int i = 0;
+                for (auto spark : *sparks) {
+                    spark->restart(position->x, position->y, (*body)[0]->getFillColor(), i);
+                    i++;
+                }
+                isFirstExplosion = false;
+            } 
+            for (auto spark : *sparks) {
+                spark->update(dt);
+            }
+            speed -= 60 * dt.asSeconds();
             position->y -= speed * dt.asSeconds();
-            /*for (auto spark : *sparks) {
-                
-            }*/
         } else {
             this->restart();
         }
@@ -60,17 +76,16 @@ void Firework::update(sf::Time dt){
 }
 
 void Firework::draw(sf::RenderWindow &target){
-    if (speed > 50) {
+    if (speed > 80) {
         for (auto cell : *body) {
             target.draw(*cell);
         }
     } else {
-        /*
         for (auto spark : *sparks) {
-            spark.draw(target);
-            }
-            */
+            spark->draw(target);
+        }
     }
+    
 }
 
 Firework::~Firework(){

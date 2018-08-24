@@ -19,8 +19,8 @@ int main(int agrc, char *argv[])
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
 
-    int width = 1000, height = 1000;
-    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Default, settings);
+    int width = 1920, height = 1080;
+    sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!",sf::Style::Fullscreen, settings);
     //sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
 
     srand(time(NULL));
@@ -28,7 +28,7 @@ int main(int agrc, char *argv[])
     /* Game variables*/
     sf::Clock clock;
 
-    const int maxFireworks = 20;
+    const int maxFireworks = 30;
     std::vector<Firework*> *fireworks;
     fireworks = new std::vector<Firework*> ;
     for (int i = 0; i < maxFireworks; i++) {
@@ -39,7 +39,7 @@ int main(int agrc, char *argv[])
     while (window.isOpen())
     {
         sf::Time dt = clock.restart();
-        window.clear(sf::Color(10, 10, 10));
+        window.clear(sf::Color(0, 0, 0, 0));
 
         // Clear everything from the last frame
         /*     

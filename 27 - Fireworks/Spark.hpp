@@ -1,18 +1,17 @@
+#pragma once
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
 class Spark {
     public:
-        Spark(int width, int height, int row, int col, int size);
+        Spark();
         void update(sf::Time dt);
         void draw(sf::RenderWindow& target);
-        void setVisited();
-        bool getIsVisited();
-        void breakWall(int index); /* 0 = top 1 = right 2 = bottom 3 = left */
-        sf::Vector2i getPosition();
-        sf::RectangleShape* getBackground();
+        void restart(int x, int y, sf::Color color, int n);
+        static const int maxSparks = 100;
         ~Spark();
     private:
         sf::Vector2f *position;
-        sf::Vector2f * size;
+        sf::RectangleShape *body;
+        sf::Vector2f *speed;
 };
